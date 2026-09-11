@@ -28,7 +28,7 @@ class CustomAuthHeader extends StatelessWidget {
           children: [
             Positioned(
               top: -120,
-              right: 245,
+              right: 165,
               child: Container(
                 width: 360,
                 height: 360,
@@ -40,7 +40,7 @@ class CustomAuthHeader extends StatelessWidget {
             ),
             Positioned(
               top: -100,
-              right: 290,
+              right: 210,
               child: Container(
                 height: 320,
                 width: 320,

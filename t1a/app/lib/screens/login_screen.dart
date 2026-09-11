@@ -10,7 +10,7 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0F1A24),
+      backgroundColor: const Color.fromARGB(255, 0, 0, 0),
       body: Column(
         children: [
           // No back button on initial screen
