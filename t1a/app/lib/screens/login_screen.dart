@@ -1,11 +1,57 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../widgets/custom_text_field.dart';
 import '../widgets/primary_button.dart';
 import '../bar/head.dart';
 import 'register_screen.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  bool _isloading = false;
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _handleLogin() async {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+
+    if (email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please fill in both email and password")),
+      );
+      return;
+    }
+
+    setState(() => _isloading = true);
+
+    try {
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      // Navigation happens automatically if you use StreamBuilder<User?> in main.dart
+    } on FirebaseAuthException catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.message ?? "Authentication failed")),
+      );
+    } finally {
+      if (mounted) setState(() => _isloading = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,13 +73,15 @@ class LoginScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 10),
-                  const CustomTextField(
+                  CustomTextField(
                     label: "Email",
                     hint: "Ferdinand@gmail.com",
+                    controller: _emailController,
                   ),
-                  const CustomTextField(
+                  CustomTextField(
                     label: "Password",
                     hint: "********",
+                    controller: _passwordController,
                     isPassword: true,
                   ),
                   Align(
@@ -49,7 +97,9 @@ class LoginScreen extends StatelessWidget {
                   const SizedBox(height: 10),
                   PrimaryButton(
                     text: "Login",
-                    onPressed: () {},
+                    onPressed: () {
+                      _handleLogin();
+                    },
                   ),
                   const SizedBox(height: 30),
                   Row(
