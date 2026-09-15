@@ -1,5 +1,6 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:app/bar/authmethods.dart';
+import 'package:app/widgets/googleauth.dart';
 import '../widgets/custom_text_field.dart';
 import '../widgets/primary_button.dart';
 import '../bar/head.dart';
@@ -16,6 +17,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _isloading = false;
+  bool _isGoogleLoading = false;
 
   @override
   void dispose() {
@@ -38,18 +40,32 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => _isloading = true);
 
     try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
+      await loginUser(
         email: email,
         password: password,
       );
-      // Navigation happens automatically if you use StreamBuilder<User?> in main.dart
-    } on FirebaseAuthException catch (e) {
+    } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.message ?? "Authentication failed")),
+        SnackBar(content: Text(e.toString())),
       );
     } finally {
       if (mounted) setState(() => _isloading = false);
+    }
+  }
+
+  Future<void> _handleGoogleSignIn() async {
+    setState(() => _isGoogleLoading = true);
+
+    try {
+      await signInWithGoogle();
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error: $e")),
+      );
+    } finally {
+      if (mounted) setState(() => _isGoogleLoading = false);
     }
   }
 
@@ -59,13 +75,11 @@ class _LoginScreenState extends State<LoginScreen> {
       backgroundColor: const Color.fromARGB(255, 0, 0, 0),
       body: Column(
         children: [
-          // No back button on initial screen
           const CustomAuthHeader(
             title: "Login",
             subtitle: "Sign in to Account",
             showBackButton: false,
           ),
-
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
@@ -95,15 +109,16 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   const SizedBox(height: 10),
-                  PrimaryButton(
-                    text: "Login",
-                    onPressed: () {
-                      _handleLogin();
-                    },
-                  ),
+                  _isloading
+                      ? const Center(
+                          child: CircularProgressIndicator(
+                            color: Color(0xFFFA4A66),
+                          ),
+                        )
+                      : PrimaryButton(text: "login", onPressed: _handleLogin),
                   const SizedBox(height: 30),
-                  Row(
-                    children: const [
+                  const Row(
+                    children: [
                       Expanded(child: Divider(color: Colors.white24, thickness: 1)),
                       Padding(
                         padding: EdgeInsets.symmetric(horizontal: 16),
@@ -118,9 +133,20 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(height: 30),
                   Row(
                     children: [
-                      Expanded(child: _buildSocialButton(Icons.facebook, "Facebook", Colors.blue)),
+                      Expanded(
+                        child: _buildSocialButton(
+                          Icons.facebook,
+                          "Facebook",
+                          Colors.blue,
+                        ),
+                      ),
                       const SizedBox(width: 16),
-                      Expanded(child: _buildSocialButton(Icons.g_mobiledata, "Google", Colors.redAccent)),
+                      Expanded(
+                        child: GoogleAuthButton(
+                          onTap: _handleGoogleSignIn,
+                          isLoading: _isGoogleLoading,
+                        ),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 40),

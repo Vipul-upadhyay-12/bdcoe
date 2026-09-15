@@ -1,3 +1,4 @@
+import 'package:app/bar/authmethods.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../widgets/custom_text_field.dart';
@@ -16,6 +17,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _repeatPasswordController = TextEditingController();
   bool _isLoading = false;
+  
 
   @override
   void dispose() {
@@ -48,16 +50,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     setState(() => _isLoading = true);
 
+    
+
     try {
       // Create user with Firebase Auth
-      UserCredential userCredential = await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-
-      // Save Full Name into Firebase Auth display name
-      await userCredential.user?.updateDisplayName(name);
+      await registerUser(name: name, email: email, password: password);
 
       // Pop back to the root; Auth gatekeeper automatically loads HomeScreen
       if (mounted) {
