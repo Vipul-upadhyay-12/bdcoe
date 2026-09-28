@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:store_app/cart_services.dart';
 import 'package:store_app/elements/prod_details.dart';
 import 'package:store_app/elements/product_model.dart'; // Ensure this path matches your setup
 
@@ -7,14 +8,16 @@ class ProductDetailsScreen extends StatelessWidget {
   
   const ProductDetailsScreen({super.key, required this.product});
 
-  void _addToCart(BuildContext context) {
-    // We will wire up the shared_preferences local storage logic here in the next step
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text("${product.title} added to cart!"),
-        backgroundColor: const Color(0xFF0D9488),
-      ),
-    );
+  void _addToCart(BuildContext context) async {
+    await CartService().addToCart(product); 
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("${product.title} added to cart!"),
+          backgroundColor: const Color(0xFF0D9488),
+        ),
+      );
+    }
   }
 
   @override

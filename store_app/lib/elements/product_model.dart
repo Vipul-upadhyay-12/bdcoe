@@ -13,12 +13,12 @@ class Product {
     required this.image,
   });
 
-  // Factory constructor to safely parse the JSON response
+  // Factory constructor is usedd to safely parse the json response
   factory Product.fromJson(Map json) {
     return Product(
       id: json['id'],
       title: json['title'],
-      // Parsed as num and converted to double in case the API returns an integer (e.g., 20 instead of 20.0)
+      // Parsed as num and converted to double in case the api returns an integer
       price: (json['price'] as num).toDouble(),
       description: json['description'],
       image: json['image'],

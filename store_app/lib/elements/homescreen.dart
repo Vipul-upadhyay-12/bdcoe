@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:store_app/cart_screen.dart';
+import 'package:store_app/cart_services.dart';
 import 'package:store_app/elements/prod_details.dart';
 import 'api_service.dart';
 import 'package:store_app/elements/product_model.dart';
@@ -15,7 +17,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State {
   final ApiService _apiService = ApiService();
   late Future _productsFuture;
-  final Color burgundy = const Color(0xFF800020);
+  final Color burgundy = const Color(0xFF0D9488);
 
   @override
   void initState() {
@@ -26,7 +28,7 @@ class _HomeScreenState extends State {
 
   void _logout() async {
     try {
-      //await CartService().clearCart();
+      await CartService().clearCart();
       await AuthService().logout();
     } catch (e) {
       print("Logout Error: $e"); // This will print directly to your Chrome console
@@ -41,6 +43,18 @@ class _HomeScreenState extends State {
         title: const Text("Store", style: TextStyle(color: Colors.white)),
         backgroundColor: burgundy,
         actions: [
+          // IconButton(
+          //   icon: const Icon(Icons.logout, color: Colors.white),
+          //   onPressed: _logout,
+          // ),
+        
+        
+          IconButton(
+            icon: const Icon(Icons.shopping_cart, color: Colors.white),
+            onPressed: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const CartScreen()));
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.logout, color: Colors.white),
             onPressed: _logout,
